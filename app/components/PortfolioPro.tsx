@@ -1,8 +1,10 @@
 "use client";
-import React, { useMemo, useRef, useState, useEffect } from "react";
+
+import { useMemo, useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, Play, Filter, Clock, Calendar, Tag } from "lucide-react";
-// ↓ añade esto cerca del inicio del archivo, antes de usar VIDEOS o deriveFacets
+
+// ===== Tipos =====
 type Video = {
   id: string;
   title: string;
@@ -15,57 +17,19 @@ type Video = {
   description?: string;
 };
 
-// Tu array:
-const VIDEOS: Video[] = [
-  {
-    id: "kia-sportage-1",
-    title: "Kia Sportage — Interior POV",
-    src: "/videos/kia-sportage-1.mp4",
-    poster: "/thumbs/kia-sportage-1.jpg",
-    brand: "KIA",
-    tags: ["Automotive", "Cinematic", "POV"],
-    year: 2025,
-    durationSec: 8,
-    description: "POV reveal…",
-  },
-  // ...más
-];
-
-// Función tipada
-function deriveFacets(videos: Video[]): { tags: string[]; brands: string[] } {
-  const tagSet = new Set<string>();
-  const brandSet = new Set<string>();
-  videos.forEach((v) => {
-    v.tags?.forEach((t) => tagSet.add(t));
-    if (v.brand) brandSet.add(v.brand);
-  });
-  return {
-    tags: Array.from(tagSet).sort(),
-    brands: Array.from(brandSet).sort(),
-  };
-}
-
-/**
- * 🔥 Pro Video Portfolio (React + Tailwind + Framer Motion)
- * - Drop this component in a React/Vite/Next project.
- * - Tailwind required. (npx tailwindcss init -p)
- * - Works with direct MP4 URLs (Vercel/Netlify/S3/Cloudflare R2/Backblaze, etc.).
- * - Clean grid, filters, search, modal player, keyboard controls.
- * - Mobile-friendly, lazy video loading, accessible.
- */
-
-// 1) Replace with your real videos. You can extend fields as needed.
+// ===== Datos (ajústalos a tus rutas reales en /public) =====
 const VIDEOS: Video[] = [
   {
     id: "kia-sportage-1",
     title: "Kia Sportage 2025 — Interior POV",
-    src: "/videos/kia-sportage-1.mp4", // e.g. https://cdn.yourdomain.com/kia-sportage-2025.mp4
-    poster: "/thumbs/sportage-3.avif", // optional poster frame
+    src: "/videos/kia-sportage-1.mp4",
+    poster: "/thumbs/sportage-3.avif",
     brand: "KIA",
     tags: ["Automotive", "Cinematic", "POV"],
     year: 2025,
     durationSec: 8,
-    description: "One-take POV revealing the interior through a dynamic window cross."
+    description:
+      "One-take POV revealing the interior through a dynamic window cross.",
   },
   {
     id: "kia-sportage-interior",
@@ -76,7 +40,7 @@ const VIDEOS: Video[] = [
     tags: ["Design", "Luxury", "Product"],
     year: 2025,
     durationSec: 8,
-    description: "Single scene showcasing KIA Sportage 2025 luxury interior."
+    description: "Single scene showcasing KIA Sportage 2025 luxury interior.",
   },
   {
     id: "tesla-interior-reveal",
@@ -87,11 +51,11 @@ const VIDEOS: Video[] = [
     tags: ["Design", "Luxury", "Product"],
     year: 2025,
     durationSec: 8,
-    description: "Tesla ad showing whole luxury interior."
-  }
+    description: "Tesla ad showing whole luxury interior.",
+  },
 ];
 
-// 2) Helper — derive all unique tags and brands for filters
+// ===== Helper (tipado) =====
 function deriveFacets(videos: Video[]): { tags: string[]; brands: string[] } {
   const tagSet = new Set<string>();
   const brandSet = new Set<string>();
@@ -105,8 +69,9 @@ function deriveFacets(videos: Video[]): { tags: string[]; brands: string[] } {
   };
 }
 
-// 3) Card component
-function VideoCard({ v, onOpen }) {
+// ===== Card =====
+type VideoCardProps = { v: Video; onOpen: (v: Video) => void };
+function VideoCard({ v, onOpen }: VideoCardProps) {
   return (
     <motion.button
       layout
@@ -120,6 +85,7 @@ function VideoCard({ v, onOpen }) {
     >
       <div className="aspect-video w-full overflow-hidden">
         {v.poster ? (
+          // Nota: <img> generará un warning en build; si quieres lo cambiamos a next/image luego.
           <img
             src={v.poster}
             alt={v.title}
@@ -133,20 +99,34 @@ function VideoCard({ v, onOpen }) {
       <div className="p-4 text-left">
         <div className="flex items-center gap-2 text-xs text-white/70">
           {v.brand && (
-            <span className="inline-flex items-center gap-1 rounded-full border border-white/10 px-2 py-0.5"><Tag size={14} />{v.brand}</span>
+            <span className="inline-flex items-center gap-1 rounded-full border border-white/10 px-2 py-0.5">
+              <Tag size={14} />
+              {v.brand}
+            </span>
           )}
           {v.year && (
-            <span className="inline-flex items-center gap-1 rounded-full border border-white/10 px-2 py-0.5"><Calendar size={14} />{v.year}</span>
+            <span className="inline-flex items-center gap-1 rounded-full border border-white/10 px-2 py-0.5">
+              <Calendar size={14} />
+              {v.year}
+            </span>
           )}
           {v.durationSec && (
-            <span className="inline-flex items-center gap-1 rounded-full border border-white/10 px-2 py-0.5"><Clock size={14} />{v.durationSec}s</span>
+            <span className="inline-flex items-center gap-1 rounded-full border border-white/10 px-2 py-0.5">
+              <Clock size={14} />
+              {v.durationSec}s
+            </span>
           )}
         </div>
         <h3 className="mt-2 text-base font-semibold leading-tight">{v.title}</h3>
         {v.tags?.length ? (
           <div className="mt-2 flex flex-wrap gap-2">
-            {v.tags.map(t => (
-              <span key={t} className="text-xs rounded-full bg-white/5 border border-white/10 px-2 py-0.5">{t}</span>
+            {v.tags.map((t) => (
+              <span
+                key={t}
+                className="text-xs rounded-full bg-white/5 border border-white/10 px-2 py-0.5"
+              >
+                {t}
+              </span>
             ))}
           </div>
         ) : null}
@@ -157,12 +137,18 @@ function VideoCard({ v, onOpen }) {
   );
 }
 
-// 4) Modal player (accessible)
-function VideoModal({ open, onClose, video }) {
-  const videoRef = useRef(null);
+// ===== Modal =====
+type VideoModalProps = {
+  open: boolean;
+  onClose: () => void;
+  video: Video | null;
+};
+
+function VideoModal({ open, onClose, video }: VideoModalProps) {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
-    function onKey(e) {
+    function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
       if (e.key === " ") {
         e.preventDefault();
@@ -228,13 +214,19 @@ function VideoModal({ open, onClose, video }) {
             </div>
             <div className="flex flex-wrap items-start gap-2 sm:justify-end">
               {video.brand && (
-                <span className="text-xs rounded-full border border-white/10 px-2 py-0.5">{video.brand}</span>
+                <span className="text-xs rounded-full border border-white/10 px-2 py-0.5">
+                  {video.brand}
+                </span>
               )}
               {video.year && (
-                <span className="text-xs rounded-full border border-white/10 px-2 py-0.5">{video.year}</span>
+                <span className="text-xs rounded-full border border-white/10 px-2 py-0.5">
+                  {video.year}
+                </span>
               )}
               {video.durationSec && (
-                <span className="text-xs rounded-full border border-white/10 px-2 py-0.5">{video.durationSec}s</span>
+                <span className="text-xs rounded-full border border-white/10 px-2 py-0.5">
+                  {video.durationSec}s
+                </span>
               )}
             </div>
           </div>
@@ -244,14 +236,14 @@ function VideoModal({ open, onClose, video }) {
   );
 }
 
-// 5) Main component
+// ===== Página principal =====
 export default function PortfolioPro() {
   const [query, setQuery] = useState("");
   const [brandFilter, setBrandFilter] = useState("All");
   const [tagFilter, setTagFilter] = useState("All");
-  const [sortBy, setSortBy] = useState("Newest");
+  const [sortBy, setSortBy] = useState<"Newest" | "Oldest" | "Shortest" | "Longest">("Newest");
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState(null);
+  const [active, setActive] = useState<Video | null>(null);
 
   const facets = useMemo(() => deriveFacets(VIDEOS), []);
 
@@ -261,19 +253,20 @@ export default function PortfolioPro() {
     // Search
     if (query.trim()) {
       const q = query.toLowerCase();
-      out = out.filter(v =>
-        v.title.toLowerCase().includes(q) ||
-        v.brand?.toLowerCase().includes(q) ||
-        v.tags?.some(t => t.toLowerCase().includes(q)) ||
-        v.description?.toLowerCase().includes(q)
+      out = out.filter(
+        (v) =>
+          v.title.toLowerCase().includes(q) ||
+          v.brand?.toLowerCase().includes(q) ||
+          v.tags?.some((t) => t.toLowerCase().includes(q)) ||
+          v.description?.toLowerCase().includes(q)
       );
     }
 
     // Brand filter
-    if (brandFilter !== "All") out = out.filter(v => v.brand === brandFilter);
+    if (brandFilter !== "All") out = out.filter((v) => v.brand === brandFilter);
 
     // Tag filter
-    if (tagFilter !== "All") out = out.filter(v => v.tags?.includes(tagFilter));
+    if (tagFilter !== "All") out = out.filter((v) => v.tags?.includes(tagFilter));
 
     // Sort
     out.sort((a, b) => {
@@ -287,7 +280,7 @@ export default function PortfolioPro() {
     return out;
   }, [query, brandFilter, tagFilter, sortBy]);
 
-  function openVideo(v) {
+  function openVideo(v: Video) {
     setActive(v);
     setOpen(true);
   }
@@ -332,33 +325,43 @@ export default function PortfolioPro() {
           </div>
           <div className="sm:col-span-7 grid grid-cols-3 gap-3">
             <div>
-              <label className="mb-1 flex items-center gap-2 text-xs uppercase tracking-wide text-white/50"><Filter size={14}/>Brand</label>
+              <label className="mb-1 flex items-center gap-2 text-xs uppercase tracking-wide text-white/50">
+                <Filter size={14}/>Brand
+              </label>
               <select
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 focus:ring-2 focus:ring-white/30"
                 value={brandFilter}
                 onChange={(e) => setBrandFilter(e.target.value)}
               >
                 <option>All</option>
-                {facets.brands.map(b => <option key={b}>{b}</option>)}
+                {facets.brands.map((b) => (
+                  <option key={b}>{b}</option>
+                ))}
               </select>
             </div>
             <div>
-              <label className="mb-1 flex items-center gap-2 text-xs uppercase tracking-wide text-white/50"><Filter size={14}/>Tag</label>
+              <label className="mb-1 flex items-center gap-2 text-xs uppercase tracking-wide text-white/50">
+                <Filter size={14}/>Tag
+              </label>
               <select
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 focus:ring-2 focus:ring-white/30"
                 value={tagFilter}
                 onChange={(e) => setTagFilter(e.target.value)}
               >
                 <option>All</option>
-                {facets.tags.map(t => <option key={t}>{t}</option>)}
+                {facets.tags.map((t) => (
+                  <option key={t}>{t}</option>
+                ))}
               </select>
             </div>
             <div>
-              <label className="mb-1 flex items-center gap-2 text-xs uppercase tracking-wide text-white/50"><Filter size={14}/>Sort</label>
+              <label className="mb-1 flex items-center gap-2 text-xs uppercase tracking-wide text-white/50">
+                <Filter size={14}/>Sort
+              </label>
               <select
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 focus:ring-2 focus:ring-white/30"
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
+                onChange={(e) => setSortBy(e.target.value as any)}
               >
                 <option>Newest</option>
                 <option>Oldest</option>
@@ -373,10 +376,12 @@ export default function PortfolioPro() {
       {/* Grid */}
       <main className="mx-auto max-w-7xl px-4 py-6">
         {filtered.length === 0 ? (
-          <p className="rounded-xl border border-white/10 bg-white/5 p-6 text-center text-white/60">No videos match your filters.</p>
+          <p className="rounded-xl border border-white/10 bg-white/5 p-6 text-center text-white/60">
+            No videos match your filters.
+          </p>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map(v => (
+            {filtered.map((v) => (
               <VideoCard key={v.id} v={v} onOpen={openVideo} />
             ))}
           </div>
