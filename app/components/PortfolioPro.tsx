@@ -2,6 +2,48 @@
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, Play, Filter, Clock, Calendar, Tag } from "lucide-react";
+// ↓ añade esto cerca del inicio del archivo, antes de usar VIDEOS o deriveFacets
+type Video = {
+  id: string;
+  title: string;
+  src: string;
+  poster?: string;
+  brand?: string;
+  tags?: string[];
+  year?: number;
+  durationSec?: number;
+  description?: string;
+};
+
+// Tu array:
+const VIDEOS: Video[] = [
+  {
+    id: "kia-sportage-1",
+    title: "Kia Sportage — Interior POV",
+    src: "/videos/kia-sportage-1.mp4",
+    poster: "/thumbs/kia-sportage-1.jpg",
+    brand: "KIA",
+    tags: ["Automotive", "Cinematic", "POV"],
+    year: 2025,
+    durationSec: 8,
+    description: "POV reveal…",
+  },
+  // ...más
+];
+
+// Función tipada
+function deriveFacets(videos: Video[]): { tags: string[]; brands: string[] } {
+  const tagSet = new Set<string>();
+  const brandSet = new Set<string>();
+  videos.forEach((v) => {
+    v.tags?.forEach((t) => tagSet.add(t));
+    if (v.brand) brandSet.add(v.brand);
+  });
+  return {
+    tags: Array.from(tagSet).sort(),
+    brands: Array.from(brandSet).sort(),
+  };
+}
 
 /**
  * 🔥 Pro Video Portfolio (React + Tailwind + Framer Motion)
@@ -50,11 +92,11 @@ const VIDEOS = [
 ];
 
 // 2) Helper — derive all unique tags and brands for filters
-function deriveFacets(videos) {
-  const tagSet = new Set();
-  const brandSet = new Set();
-  videos.forEach(v => {
-    v.tags?.forEach(t => tagSet.add(t));
+function deriveFacets(videos: Video[]): { tags: string[]; brands: string[] } {
+  const tagSet = new Set<string>();
+  const brandSet = new Set<string>();
+  videos.forEach((v) => {
+    v.tags?.forEach((t) => tagSet.add(t));
     if (v.brand) brandSet.add(v.brand);
   });
   return {
