@@ -2,7 +2,11 @@
 
 import { useMemo, useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import { Search, X, Play, Filter, Clock, Calendar, Tag } from "lucide-react";
+
+const SORT_OPTIONS = ["Newest", "Oldest", "Shortest", "Longest"] as const;
+type SortKey = typeof SORT_OPTIONS[number];
 
 // ===== Tipos =====
 type Video = {
@@ -83,19 +87,20 @@ function VideoCard({ v, onOpen }: VideoCardProps) {
       transition={{ type: "spring", stiffness: 260, damping: 20 }}
       aria-label={`Open video ${v.title}`}
     >
-      <div className="aspect-video w-full overflow-hidden">
+      <div className="aspect-video w-full overflow-hidden relative">
         {v.poster ? (
-          // Nota: <img> generará un warning en build; si quieres lo cambiamos a next/image luego.
-          <img
+          <Image
             src={v.poster}
             alt={v.title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            priority={false}
           />
         ) : (
           <div className="h-full w-full bg-black" />
         )}
       </div>
+
       <div className="p-4 text-left">
         <div className="flex items-center gap-2 text-xs text-white/70">
           {v.brand && (
@@ -241,7 +246,7 @@ export default function PortfolioPro() {
   const [query, setQuery] = useState("");
   const [brandFilter, setBrandFilter] = useState("All");
   const [tagFilter, setTagFilter] = useState("All");
-  const [sortBy, setSortBy] = useState<"Newest" | "Oldest" | "Shortest" | "Longest">("Newest");
+  const [sortBy, setSortBy] = useState<SortKey>("Newest");
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<Video | null>(null);
 
@@ -361,12 +366,11 @@ export default function PortfolioPro() {
               <select
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 focus:ring-2 focus:ring-white/30"
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={(e) => setSortBy(e.target.value as SortKey)}
               >
-                <option>Newest</option>
-                <option>Oldest</option>
-                <option>Shortest</option>
-                <option>Longest</option>
+                {SORT_OPTIONS.map(opt => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
               </select>
             </div>
           </div>
