@@ -302,14 +302,26 @@ export default function PortfolioPro() {
           >
             Alberto Dies — Video Portfolio
           </motion.h1>
-          <div className="flex items-center gap-3 text-sm text-white/60">
-            <span>MP4 • Responsive • Modal Player</span>
+          {/* Botones de contacto */}
+          <div className="flex gap-2">
+            <a
+              href="mailto:albertodiesc@gmail.com"
+              className="rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-sm hover:bg-white/20"
+            >
+              Contact
+            </a>
+            <a
+              href="https://wa.me/34622367027"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-xl border border-white/10 bg-green-600/20 px-3 py-2 text-sm hover:bg-green-600/30"
+            >
+              WhatsApp
+            </a>
           </div>
         </div>
-        <p className="mt-3 max-w-3xl text-white/70">
-          Selection of short-form ads and cinematic spots. Click any card to play. Use Space to pause/play, and Esc to close.
-        </p>
       </header>
+
 
       {/* Controls */}
       <section className="mx-auto max-w-7xl px-4">
