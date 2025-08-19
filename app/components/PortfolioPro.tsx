@@ -55,7 +55,7 @@ function deriveFacets(videos: Video[]): { tags: string[]; brands: string[] } {
  */
 
 // 1) Replace with your real videos. You can extend fields as needed.
-const VIDEOS = [
+const VIDEOS: Video[] = [
   {
     id: "kia-sportage-1",
     title: "Kia Sportage 2025 — Interior POV",
